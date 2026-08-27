@@ -47,8 +47,14 @@ the upstream scalar reference is one full pass.
 
 | kernel | Mojo | upstream | speedup | comparison |
 | --- | ---: | ---: | ---: | --- |
-| lat/lng radians to leaf `CellId`, 500k | 180.77 ms | 5947.60 ms | 32.90x | `s2sphere` scalar loop |
-| `CellId` parent(level=12), 500k | 2.89 ms | 826.03 ms | 285.35x | `s2sphere` scalar loop |
+| lat/lng radians to leaf `CellId`, 500k | 174.26 ms | 6208.29 ms | 35.63x | `s2sphere` scalar loop |
+| `CellId` parent(level=12), 500k | 2.74 ms | 812.45 ms | 296.22x | `s2sphere` scalar loop |
+
+Both measured kernels exceed the 5x optimization cutoff. No SIMD, threading,
+or GPU path was added: bulk parent conversion has too little arithmetic per
+byte to benefit from GPU offload, while the compute-heavy latitude/longitude
+kernel is already 35.63x faster than the upstream implementation and is not an
+optimization target.
 
 ## How it works
 
